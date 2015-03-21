@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Hello </h1>
+    	<canvas height='320' width='640' id='example'>Обновите браузер</canvas>
+        <script>
+            var example = document.getElementById("example"),
+                ctx     = example.getContext('2d');
+            ctx.strokeRect(0, 0, example.width, example.height);
+        </script>
+<p>There are coordinates of the mouse!!!</p>
+    <input id='mouseX' name='mouseX' type="text" size="4"/>
+    <input id='mouseY' type="text" size="4"/>
+    <input id='key' type='text' size ='25' />
+    <!-- Add your TypeScript code block using type="text/typescript" -->
+    
+	<script src="gestures.js"> </script>   
+    
+</body>
+</html>
