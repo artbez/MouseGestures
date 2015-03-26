@@ -35,6 +35,17 @@ interface PairArrayS {
 	push;
 }
 
+class Gesture {
+    name: string;
+    key: string[];
+    
+    constructor(public newName : string, public newKey : string[])
+    {
+        this.name = newName;
+        this.key = newKey;
+    }
+}
+
 class KeyGiver {
 	
 	list : PairArray = [];
@@ -45,10 +56,10 @@ class KeyGiver {
 	maxX : number;
 	maxY : number;
 	
-	gesture : string[];
+	gestures : Gesture[];
 	
-	constructor (public newList : PairArray, public oldGesture : string[]) {
-		this.gesture = oldGesture;
+	constructor (public newList : PairArray, public oldGesture : Gesture[]) {
+		this.gestures = oldGesture;
 		this.list = newList;
 		this.minX = newList[0].first;
 		this.minY = newList[0].second;
@@ -92,10 +103,18 @@ class KeyGiver {
 	
 	
 	isGesture(key) {
-		var result = this.levenshtein(this.gesture, key) / Math.max(this.gesture.length, key.length);
-		alert(result);
-		if (result <= 0.6)
-			alert("Yes!, This is horizontal left-right line");
+        var result = 1000; //Pseudo-infinite value
+        var num = -1;
+        for (var i = 0; i < this.gestures.length; i++)
+		{
+            var curRes = this.levenshtein(this.gestures[i].key, key) / Math.max(this.gestures[i].key.length, key.length);
+            if (curRes < result) {
+                result = curRes;
+                num = i;
+            }
+        }
+        if (result <= 0.6) 
+            alert("Yes!, This is " + this.gestures[num].name);
 	}
 	
 	levenshtein(s1, s2) {
@@ -145,8 +164,7 @@ class Greeter {
 	example : HTMLCanvasElement
 	private ctx;
 	private timer;
-    data : string[];
-	
+    data : Gesture[];	
 	constructor () {
 		this.getDevelopersList();
 		this.example = <HTMLCanvasElement> document.getElementById('example');
@@ -211,23 +229,15 @@ class Greeter {
 	}
 
 	getDevelopersList() {
-	    var url = "gestures.txt";
+	    var url = "gestures.json";
 	    this.downloadData(url, this.recieveDevelopersList.bind(this));
 	}
 	
 	recieveDevelopersList(xhr) {
-	    var fileData = xhr.responseText;
-	    var newData = [];
-	    var index = -1;
-	    for (var i = 0; i < fileData.length; i++)
-	    {
-	    	if (i % 2 == 0) {
-	    		index++;
-	    		newData[index] = "";	
-	    	}
-	    	newData[index] += fileData[i];	
-	    }
-	    this.data = newData;
+	    var fileData = JSON.parse(xhr.responseText);
+        this.data = [];
+        for (var i = 0; i < fileData.length; i++) 
+	       this.data[i] = new Gesture(<string> fileData[i].name, <string[]> fileData[i].key);
 	}
 	
 }

@@ -19,13 +19,22 @@ var PairString = (function () {
     };
     return PairString;
 })();
+var Gesture = (function () {
+    function Gesture(newName, newKey) {
+        this.newName = newName;
+        this.newKey = newKey;
+        this.name = newName;
+        this.key = newKey;
+    }
+    return Gesture;
+})();
 var KeyGiver = (function () {
     function KeyGiver(newList, oldGesture) {
         this.newList = newList;
         this.oldGesture = oldGesture;
         this.list = [];
         this.listS = [];
-        this.gesture = oldGesture;
+        this.gestures = oldGesture;
         this.list = newList;
         this.minX = newList[0].first;
         this.minY = newList[0].second;
@@ -66,10 +75,17 @@ var KeyGiver = (function () {
         return key;
     };
     KeyGiver.prototype.isGesture = function (key) {
-        var result = this.levenshtein(this.gesture, key) / Math.max(this.gesture.length, key.length);
-        alert(result);
+        var result = 1000; //Pseudo-infinite value
+        var num = -1;
+        for (var i = 0; i < this.gestures.length; i++) {
+            var curRes = this.levenshtein(this.gestures[i].key, key) / Math.max(this.gestures[i].key.length, key.length);
+            if (curRes < result) {
+                result = curRes;
+                num = i;
+            }
+        }
         if (result <= 0.6)
-            alert("Yes!, This is horizontal left-right line");
+            alert("Yes!, This is " + this.gestures[num].name);
     };
     KeyGiver.prototype.levenshtein = function (s1, s2) {
         var i, j, l1, l2, flip, ch, chl, ii, ii2, cost, cutHalf;
@@ -160,21 +176,14 @@ var Greeter = (function () {
         xhr.send();
     };
     Greeter.prototype.getDevelopersList = function () {
-        var url = "gestures.txt";
+        var url = "gestures.json";
         this.downloadData(url, this.recieveDevelopersList.bind(this));
     };
     Greeter.prototype.recieveDevelopersList = function (xhr) {
-        var fileData = xhr.responseText;
-        var newData = [];
-        var index = -1;
-        for (var i = 0; i < fileData.length; i++) {
-            if (i % 2 == 0) {
-                index++;
-                newData[index] = "";
-            }
-            newData[index] += fileData[i];
-        }
-        this.data = newData;
+        var fileData = JSON.parse(xhr.responseText);
+        this.data = [];
+        for (var i = 0; i < fileData.length; i++)
+            this.data[i] = new Gesture(fileData[i].name, fileData[i].key);
     };
     return Greeter;
 })();
