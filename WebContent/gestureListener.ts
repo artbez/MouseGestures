@@ -1,8 +1,8 @@
-/// <reference path="utils.ts" />
+/// <reference path='utils.ts' />
 /// <reference path="gestures.ts" />
 /// <reference path="keyGiver.ts" />
-
 // catch mouse events and handle it
+
 class GestureListener {
 	
 	list : utils.PairArray = [];
@@ -11,8 +11,16 @@ class GestureListener {
 	example : HTMLCanvasElement
 	private ctx;
 	private timer;
+	private d;
+	private currentTime;
+	currentPair : utils.Pair;
+	speed : number;
+	a : number;
+	c : number;
     data : gestures.Gesture[];	
 	constructor () {
+		this.a = 1;
+		this.c = 0.0275;
 		this.getDevelopersList();
 		this.example = <HTMLCanvasElement> document.getElementById('example');
 		this.ctx = this.example.getContext('2d');
@@ -22,6 +30,12 @@ class GestureListener {
 		document.addEventListener('mouseup', this.onMouseUp);
 	}
 	
+	smoothing(pair1 : utils.Pair, pair2 : utils.Pair, diff : number) {
+		var b = Math.exp(-this.c * diff);
+		return new utils.Pair(pair2.first * b + (1 - b) * pair1.first
+								, pair2.second + (1 - b) * pair1.second);
+	}
+	
 	onMouseDown(e) {
 		this.ctx.strokeStyle = "blue";
 		this.onMouseMove = <any>this.onMouseMove.bind(this);
@@ -29,6 +43,9 @@ class GestureListener {
 		delete this.list;
 		this.list = [];
 		this.ctx.beginPath();
+		this.d = new Date();
+		this.currentTime = this.d.getTime();
+		this.currentPair = new utils.Pair(e.pageX - this.example.offsetLeft, e.pageY - this.example.offsetTop)
 	}
 	
 	onMouseUp() {
@@ -47,8 +64,12 @@ class GestureListener {
 		var inputValueX = (<HTMLInputElement>document.getElementById('mouseX'));
 		var inputValueY = (<HTMLInputElement>document.getElementById('mouseY'));
 		this.p = new utils.Pair(e.pageX - this.example.offsetLeft, e.pageY - this.example.offsetTop);
+		var n = this.d.getTime();
+		var diff = n - this.currentTime;
+		this.currentTime = n;
+		this.p = this.smoothing(this.currentPair, this.p, diff);
+		this.currentPair = this.p;
 		this.list.push(this.p);
-		
 		this.ctx.lineTo(this.p.first, this.p.second);
 		this.ctx.stroke();
 		inputValueX.value = (e.pageX - this.example.offsetLeft).toString();	
@@ -88,5 +109,3 @@ class GestureListener {
 	}
 	
 }
-
-new GestureListener();

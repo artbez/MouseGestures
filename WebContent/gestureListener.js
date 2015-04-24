@@ -1,10 +1,12 @@
-/// <reference path="utils.ts" />
+/// <reference path='utils.ts' />
 /// <reference path="gestures.ts" />
 /// <reference path="keyGiver.ts" />
 // catch mouse events and handle it
 var GestureListener = (function () {
     function GestureListener() {
         this.list = [];
+        this.a = 1;
+        this.c = 0.0275;
         this.getDevelopersList();
         this.example = document.getElementById('example');
         this.ctx = this.example.getContext('2d');
@@ -13,6 +15,10 @@ var GestureListener = (function () {
         this.onMouseUp = this.onMouseUp.bind(this);
         document.addEventListener('mouseup', this.onMouseUp);
     }
+    GestureListener.prototype.smoothing = function (pair1, pair2, diff) {
+        var b = Math.exp(-this.c * diff);
+        return new utils.Pair(pair2.first * b + (1 - b) * pair1.first, pair2.second + (1 - b) * pair1.second);
+    };
     GestureListener.prototype.onMouseDown = function (e) {
         this.ctx.strokeStyle = "blue";
         this.onMouseMove = this.onMouseMove.bind(this);
@@ -20,6 +26,9 @@ var GestureListener = (function () {
         delete this.list;
         this.list = [];
         this.ctx.beginPath();
+        this.d = new Date();
+        this.currentTime = this.d.getTime();
+        this.currentPair = new utils.Pair(e.pageX - this.example.offsetLeft, e.pageY - this.example.offsetTop);
     };
     GestureListener.prototype.onMouseUp = function () {
         var _this = this;
@@ -36,6 +45,11 @@ var GestureListener = (function () {
         var inputValueX = document.getElementById('mouseX');
         var inputValueY = document.getElementById('mouseY');
         this.p = new utils.Pair(e.pageX - this.example.offsetLeft, e.pageY - this.example.offsetTop);
+        var n = this.d.getTime();
+        var diff = n - this.currentTime;
+        this.currentTime = n;
+        this.p = this.smoothing(this.currentPair, this.p, diff);
+        this.currentPair = this.p;
         this.list.push(this.p);
         this.ctx.lineTo(this.p.first, this.p.second);
         this.ctx.stroke();
@@ -72,5 +86,4 @@ var GestureListener = (function () {
     };
     return GestureListener;
 })();
-new GestureListener();
 //# sourceMappingURL=gestureListener.js.map

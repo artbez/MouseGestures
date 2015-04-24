@@ -25,6 +25,15 @@
 		"isReversible": true
 	},
 	{
+		"name": "Square",
+		"key":
+		[
+			"A7", "A6", "A5", "A4", "A3", "A2", "A1", "A0", "B0", "C0", "D0", "E0", "F0", "G0", "H0",
+			"H1", "H2", "H3", "H4", "H5", "H6", "H7", "G7", "F7", "E7", "D7", "C7", "B7"
+		],
+		"isReversible" : true
+	},
+	{
 		"name": "Circle",
 		"key":
 		[
@@ -33,5 +42,4 @@
 		],
 		"isReversible": true
 	}
-	
 ]

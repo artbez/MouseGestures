@@ -3,8 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<script src="utils.js"> </script>
+    <script src="gestures.js"> </script>
+    <script src="keyGiver.js"> </script>
+	<script src="gestureListener.js"> </script>   
+    
 </head>
-<body>
+<body onload = "new GestureListener()">
+
 <h1> Hello </h1>
     	<canvas height='320' width='640' id='example'>Обновите браузер</canvas>
         <script>
@@ -17,8 +23,5 @@
     <input id='mouseY' type="text" size="4"/>
     <input id='key' type='text' size ='25' />
     <!-- Add your TypeScript code block using type="text/typescript" -->
-    
-	<script src="gestureListener.js"> </script>   
-    
 </body>
 </html>
