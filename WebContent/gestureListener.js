@@ -2,6 +2,7 @@
 /// <reference path="gestures.ts" />
 /// <reference path="keyGiver.ts" />
 // catch mouse events and handle it
+var context_menu = new ContextMenu();
 var GestureListener = (function () {
     function GestureListener() {
         this.list = [];

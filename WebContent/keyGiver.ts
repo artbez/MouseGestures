@@ -1,6 +1,23 @@
 /// <reference path="utils.ts" />
 /// <reference path="gestures.ts" />
 
+declare function ContextMenu() : void;
+declare function showMenu(event, parent, items) : void;
+declare var CustomEvent: {
+    prototype: CustomEvent;
+    new(): CustomEvent;
+}
+
+var context_menu = new ContextMenu();
+
+class StandardsCustomEvent {
+    static get(eventType: string, data: {}) {
+        var customEvent = <any>CustomEvent;
+        var event = new customEvent(eventType, data);
+        return <CustomEvent> event;
+    }
+}
+
 // algoritm to get a key
 module keyGiver {
 		
@@ -8,7 +25,8 @@ module keyGiver {
 		
 		list : utils.PairArray = [];
 		listS : utils.PairArrayS = [];
-		
+		private timer;
+	
 		minX : number;
 		minY : number;
 		maxX : number;
@@ -60,19 +78,68 @@ module keyGiver {
 		}
 		
 		
+		
 		isGesture(key) {
 	        var result = 1000; //Pseudo-infinite value
 	        var num = -1;
 	        for (var i = 0; i < this.gestures.length; i++)
 			{
+				var curr = this.gestures[i];
+				var prevKey = i - 1;
 	            var curRes = this.levenshtein(this.gestures[i].key, key) / Math.max(this.gestures[i].key.length, key.length);
-	            if (curRes < result) {
-	                result = curRes;
-	                num = i;
-	            }
+	           
+	            while (prevKey >=0 
+	            	&& this.levenshtein(this.gestures[prevKey].key, key) / Math.max(this.gestures[prevKey].key.length, key.length) > curRes)
+	            {
+	            	this.gestures[prevKey + 1] = this.gestures[prevKey];
+	            	this.gestures[prevKey] = curr;
+	            	prevKey--;
+	            }	
 	        }
-	        if (result <= 0.6) 
-	            alert("Yes!, This is " + this.gestures[num].name);
+	        var str = "";
+	        var prevKey = 0;
+	        while(prevKey < this.gestures.length && this.levenshtein(this.gestures[prevKey].key, key) 
+	        	/ Math.max(this.gestures[prevKey].key.length, key.length) <= 0.66)
+	        	prevKey++;
+	        
+	        	
+	        for (var i = 0; i < prevKey; ++i)
+	        	str += this.gestures[i].name + "\n";
+	        
+	        var names = new Array();
+	        for (var i = 0; i < prevKey; ++i)
+	        	names[i] = this.gestures[i].name;
+	        	
+	        var getItems = function() {
+				var items = new Array();
+				for (var i = 0; i < prevKey; ++i) {
+					items.push({"name": names[i], "action": function() { alert(names[i]); }});
+				//	items.push({"name": "item"+i, "action": function() { alert(this.name); }});
+				}
+				return items;
+			}
+			
+			var x = StandardsCustomEvent.get("myevent", {
+					detail: {
+						message: "Hello World!",
+						time: new Date(),
+					},
+					bubbles: true,
+					cancelable: true
+				});
+			
+			document.getElementById('place').addEventListener("myevent", function(e) {
+				e.preventDefault();
+				context_menu.showMenu("myevent", this, getItems());
+			}, false);
+			document.getElementById('place').setAttribute("oncontextmenu", "javascript: context_menu.showMenu('myevent', this, getItems());");		
+			document.getElementById('place').dispatchEvent(x);
+			document.getElementById('place').removeEventListener("myevent", function(e) {
+				e.preventDefault();
+				context_menu.showMenu("myevent", this, getItems());
+			}, false);
+			
+			alert('sas');
 		}
 		
 		// Calculate levenshtain's distance between s1 and s2

@@ -3,6 +3,8 @@
 /// <reference path="keyGiver.ts" />
 // catch mouse events and handle it
 
+var context_menu = new ContextMenu();
+			
 class GestureListener {
 	
 	list : utils.PairArray = [];

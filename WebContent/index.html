@@ -1,18 +1,33 @@
 <!doctype html>
 <html>
 <head>
+
 <meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<script src="context-menu.js"></script>
+	<link rel="stylesheet" type="text/css" href="context-menu.css">
+	
 <title>Insert title here</title>
-<script src="utils.js"> </script>
+	
+	<script src="jquery.js"></script>
+	<script src="utils.js"> </script>
     <script src="gestures.js"> </script>
     <script src="keyGiver.js"> </script>
-	<script src="gestureListener.js"> </script>   
-    
-</head>
-<body onload = "new GestureListener()">
+	<script src="gestureListener.js"> </script> 
+	<script>
+	function doOnLoad()
+	{
+		var context_menu = new ContextMenu();
 
+		new GestureListener();
+	}
+	</script>
+</head>
+<body onload = "doOnLoad()">
+	
 <h1> Hello </h1>
-    	<canvas height='320' width='640' id='example'>Обновите браузер</canvas>
+        <div id="place"> <canvas height='320' width='640' id='example'>Обновите браузер</canvas> </div>
         <script>
             var example = document.getElementById("example"),
                 ctx     = example.getContext('2d');
