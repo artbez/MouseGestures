@@ -1,6 +1,11 @@
 function ContextMenu() {
 
 	this.items = new Array();
+	this._isVisible = false;
+	
+	this.isVisible = function() {
+		return this._isVisible;
+	}
 	
 	this.addItem = function(item) {
 		this.items.push( {
@@ -63,11 +68,13 @@ function ContextMenu() {
 			if (self.DOMObj) {
 				self.DOMObj.parentNode.removeChild(self.DOMObj);
 			}
-			this.onclick = undefined;
-			document.removeEventListener("click", hideMenu);
+			this.onmousedown = undefined;
+			self._isVisible = false;
+			document.removeEventListener("mousedown", hideMenu);
 			document.removeEventListener("keydown", hideMenu);
 		};
-		document.addEventListener("click", hideMenu);
+		this._isVisible = true;
+		document.addEventListener("mousedown", hideMenu);
 		document.addEventListener("keydown", hideMenu);
 	};
 	
