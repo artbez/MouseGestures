@@ -101,7 +101,9 @@ module keyGiver {
 	        while(prevKey < this.gestures.length && this.levenshtein(this.gestures[prevKey].key, key) 
 	        	/ Math.max(this.gestures[prevKey].key.length, key.length) <= 0.66)
 	        	prevKey++;
-	        
+	       	
+	       	if (prevKey === 0)
+	       		return;
 	        	
 	        for (var i = 0; i < prevKey; ++i)
 	        	str += this.gestures[i].name + "\n";
@@ -127,19 +129,15 @@ module keyGiver {
 					bubbles: true,
 					cancelable: true
 				});
-			
-			document.getElementById('place').addEventListener("myevent", function(e) {
+				
+			function temp(e) {
 				e.preventDefault();
 				context_menu.showMenu("myevent", this, getItems());
-			}, false);
+			}
+			document.getElementById('place').addEventListener("myevent", temp, false);
 			document.getElementById('place').setAttribute("oncontextmenu", "javascript: context_menu.showMenu('myevent', this, getItems());");		
 			document.getElementById('place').dispatchEvent(x);
-			document.getElementById('place').removeEventListener("myevent", function(e) {
-				e.preventDefault();
-				context_menu.showMenu("myevent", this, getItems());
-			}, false);
-			
-			alert('sas');
+			document.getElementById('place').removeEventListener("myevent", temp, false);
 		}
 		
 		// Calculate levenshtain's distance between s1 and s2

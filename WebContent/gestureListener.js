@@ -2,7 +2,6 @@
 /// <reference path="gestures.ts" />
 /// <reference path="keyGiver.ts" />
 // catch mouse events and handle it
-var context_menu = new ContextMenu();
 var GestureListener = (function () {
     function GestureListener() {
         this.list = [];
@@ -21,6 +20,8 @@ var GestureListener = (function () {
         return new utils.Pair(pair2.first * b + (1 - b) * pair1.first, pair2.second + (1 - b) * pair1.second);
     };
     GestureListener.prototype.onMouseDown = function (e) {
+        if (context_menu.isVisible())
+            return;
         this.ctx.strokeStyle = "blue";
         this.onMouseMove = this.onMouseMove.bind(this);
         this.example.addEventListener('mousemove', this.onMouseMove);
@@ -33,12 +34,15 @@ var GestureListener = (function () {
     };
     GestureListener.prototype.onMouseUp = function () {
         var _this = this;
+        if (this.list.length === 0)
+            return;
         this.example.removeEventListener('mousemove', this.onMouseMove);
         this.keyG = new keyGiver.KeyGiver(this.list, this.data);
         var newKey = this.keyG.getKey();
         var outputString = "";
         for (var i = 0; i < newKey.length; i++)
             outputString += newKey[i];
+        this.list = [];
         document.getElementById('key').value = outputString;
         this.timer = setTimeout(function () { return _this.reconstruct(); }, 500);
     };
