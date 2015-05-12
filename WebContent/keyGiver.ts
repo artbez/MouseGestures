@@ -41,22 +41,42 @@ module keyGiver {
 			this.minY = newList[0].second;
 			this.maxX = newList[0].first;
 			this.maxY = newList[0].second;
-			for (var i = 0; i < this.list.length; i++) {
+			for (var i = 1; i < this.list.length; i++) {
 				if (this.list[i].first < this.minX) this.minX = this.list[i].first;
 				if (this.list[i].first > this.maxX) this.maxX = this.list[i].first;
 				if (this.list[i].second < this.minY) this.minY = this.list[i].second;
 				if (this.list[i].second > this.maxY) this.maxY = this.list[i].second; 
 			}
+			if (this.maxX - this.minX > this.maxY - this.minY) {
+				var ratio = (this.maxY - this.minY) / (this.maxX - this.minX);
+				var midValue = (this.maxY + this.minY) / 2;
+				for (var i = 0; i < this.list.length; i++) {
+					this.list[i].second = midValue - (midValue - this.list[i].second) * ratio;
+				}
+			}
+			if (this.maxX - this.minX < this.maxY - this.minY) {
+				var ratio =  (this.maxX - this.minX) / (this.maxY - this.minY);
+				var midValue = (this.maxX + this.minX) / 2;
+				for (var i = 0; i < this.list.length; i++) {
+					this.list[i].first = midValue - (midValue - this.list[i].first) * ratio;
+				}
+			}
+			this.minX = newList[0].first;
+			this.minY = newList[0].second;
+			for (var i = 1; i < this.list.length; i++) {
+				if (this.list[i].first < this.minX) this.minX = this.list[i].first;
+				if (this.list[i].second < this.minY) this.minY = this.list[i].second;
+			}
 		}
-		
+
 		getSymbol(pair : utils.Pair)
 		{
 			var curAr1 = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 			var curNumX = pair.first - this.minX;
 			var curNumY = pair.second - this.minY;
 			
-			return curAr1[Math.floor((curNumX) / Math.floor((this.maxX + 8 - this.minX) / 8))] + 
-				+ (Math.floor((curNumY) / Math.floor((this.maxY + 8 - this.minY) / 8)));
+			return curAr1[Math.floor(curNumX * 8 / (this.maxX + 1 - this.minX))] + 
+				+ (Math.floor(curNumY * 8 / Math.floor(this.maxY + 1 - this.minY)));
 		}
 		
 		public getKey() {
@@ -99,7 +119,7 @@ module keyGiver {
 	        var str = "";
 	        var prevKey = 0;
 	        while(prevKey < this.gestures.length && this.levenshtein(this.gestures[prevKey].key, key) 
-	        	/ Math.max(this.gestures[prevKey].key.length, key.length) <= 0.66)
+	        	/ Math.max(this.gestures[prevKey].key.length, key.length) <= 0.4)
 	        	prevKey++;
 	       	
 	       	if (prevKey === 0)
