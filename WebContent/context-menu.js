@@ -96,7 +96,7 @@ function ContextMenu() {
 			name.textContent = this.items[i]["name"];
 			item.appendChild(name);
 			if (this.items[i].isSimpleItem) {
-				item.onclick = function() {
+				item.onmousedown = function() {
 					var ix = this.getAttribute("data-index");
 					self.items[ix].action();
 				};

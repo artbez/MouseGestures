@@ -135,7 +135,7 @@ module keyGiver {
 	        var getItems = function() {
 				var items = new Array();
 				for (var i = 0; i < prevKey; ++i) {
-					items.push({"name": names[i], "action": function() { alert(names[i]); }});
+					items.push({"name": names[i], "action": function(text) { alert(text); }.bind(null, names[i])});
 				}
 				return items;
 			}
