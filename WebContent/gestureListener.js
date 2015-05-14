@@ -7,6 +7,7 @@ var GestureListener = (function () {
         this.list = [];
         this.a = 1;
         this.c = 0.0275;
+        this.state = 0;
         this.getDevelopersList();
         this.example = document.getElementById('example');
         this.ctx = this.example.getContext('2d');
@@ -20,23 +21,38 @@ var GestureListener = (function () {
         return new utils.Pair(pair2.first * b + (1 - b) * pair1.first, pair2.second + (1 - b) * pair1.second);
     };
     GestureListener.prototype.onMouseDown = function (e) {
-        if (context_menu.isVisible())
+        if (context_menu.isVisible()) {
             return;
+        }
+        if (this.flagDraw == false) {
+            clearTimeout(this.timer);
+            this.flagDraw = true;
+        }
+        this.ctx.beginPath();
+        if (this.state === 0) {
+            delete this.list;
+            this.list = [];
+            this.state = 1;
+        }
         this.ctx.strokeStyle = "blue";
         this.onMouseMove = this.onMouseMove.bind(this);
         this.example.addEventListener('mousemove', this.onMouseMove);
-        delete this.list;
-        this.list = [];
-        this.ctx.beginPath();
         this.d = new Date();
         this.currentTime = this.d.getTime();
         this.currentPair = new utils.Pair(e.pageX - this.example.offsetLeft, e.pageY - this.example.offsetTop);
+        this.onMouseMove(e);
     };
     GestureListener.prototype.onMouseUp = function () {
         var _this = this;
         if (this.list.length === 0)
             return;
         this.example.removeEventListener('mousemove', this.onMouseMove);
+        this.flagDraw = false;
+        this.timer = setTimeout(function () { return _this.finishDraw(); }, 1000);
+    };
+    GestureListener.prototype.finishDraw = function () {
+        if (this.flagDraw === true)
+            return;
         this.keyG = new keyGiver.KeyGiver(this.list, this.data);
         var newKey = this.keyG.getKey();
         var outputString = "";
@@ -44,9 +60,11 @@ var GestureListener = (function () {
             outputString += newKey[i];
         this.list = [];
         document.getElementById('key').value = outputString;
-        this.timer = setTimeout(function () { return _this.reconstruct(); }, 500);
+        this.reconstruct();
     };
     GestureListener.prototype.onMouseMove = function (e) {
+        if (this.flagDraw === false)
+            return;
         var inputValueX = document.getElementById('mouseX');
         var inputValueY = document.getElementById('mouseY');
         this.p = new utils.Pair(e.pageX - this.example.offsetLeft, e.pageY - this.example.offsetTop);
@@ -62,6 +80,7 @@ var GestureListener = (function () {
         inputValueY.value = (e.pageY - this.example.offsetTop).toString();
     };
     GestureListener.prototype.reconstruct = function () {
+        this.state = 0;
         this.ctx.strokeStyle = "black";
         this.ctx.clearRect(0, 0, this.example.width, this.example.height);
         this.ctx.strokeRect(0, 0, this.example.width, this.example.height);

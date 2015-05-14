@@ -7,6 +7,8 @@ class GestureListener {
 	
 	list : utils.PairArray = [];
 	p: utils.Pair;
+	flagDraw : boolean;
+	state : number;
 	keyG : keyGiver.KeyGiver;
 	example : HTMLCanvasElement
 	private ctx;
@@ -21,6 +23,7 @@ class GestureListener {
 	constructor () {
 		this.a = 1;
 		this.c = 0.0275;
+		this.state = 0;
 		this.getDevelopersList();
 		this.example = <HTMLCanvasElement> document.getElementById('example');
 		this.ctx = this.example.getContext('2d');
@@ -38,22 +41,42 @@ class GestureListener {
 	
 	onMouseDown(e) {
 		if (context_menu.isVisible())
+		{
 			return;
+		}
+		if (this.flagDraw == false)
+		{
+			clearTimeout(this.timer);	
+			this.flagDraw = true;
+		}
+		
+		this.ctx.beginPath();
+		if (this.state === 0)
+		{
+			delete this.list;
+			this.list = [];
+			this.state = 1;
+		}
 		this.ctx.strokeStyle = "blue";
 		this.onMouseMove = <any>this.onMouseMove.bind(this);
 		this.example.addEventListener('mousemove', this.onMouseMove);
-		delete this.list;
-		this.list = [];
-		this.ctx.beginPath();
 		this.d = new Date();
 		this.currentTime = this.d.getTime();
-		this.currentPair = new utils.Pair(e.pageX - this.example.offsetLeft, e.pageY - this.example.offsetTop)
+		this.currentPair = new utils.Pair(e.pageX - this.example.offsetLeft, e.pageY - this.example.offsetTop);
+		this.onMouseMove(e);
 	}
 	
 	onMouseUp() {
 		if (this.list.length === 0)
 			return;
 		this.example.removeEventListener('mousemove', this.onMouseMove);
+		this.flagDraw = false;
+		this.timer = setTimeout(() => this.finishDraw(), 1000);	
+	}
+	
+	finishDraw() {
+		if (this.flagDraw === true)
+			return;
 		this.keyG = new keyGiver.KeyGiver(this.list, this.data);
 		var newKey = this.keyG.getKey();
 		var outputString = "";
@@ -61,11 +84,14 @@ class GestureListener {
 			outputString += newKey[i];
 		this.list = [];
 		(<HTMLInputElement>document.getElementById('key')).value = outputString;
-		this.timer = setTimeout(() => this.reconstruct(), 500);
+		this.reconstruct();
 	}
 	
 	onMouseMove(e)
 	{  
+		if (this.flagDraw === false)
+			return;
+	
 		var inputValueX = (<HTMLInputElement>document.getElementById('mouseX'));
 		var inputValueY = (<HTMLInputElement>document.getElementById('mouseY'));
 		this.p = new utils.Pair(e.pageX - this.example.offsetLeft, e.pageY - this.example.offsetTop);
@@ -82,6 +108,7 @@ class GestureListener {
 	}
 	
 	reconstruct() {
+		this.state = 0;
 		this.ctx.strokeStyle = "black";
 		this.ctx.clearRect(0, 0, this.example.width, this.example.height);
 		this.ctx.strokeRect(0, 0, this.example.width, this.example.height);	

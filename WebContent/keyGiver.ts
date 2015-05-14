@@ -136,7 +136,6 @@ module keyGiver {
 				var items = new Array();
 				for (var i = 0; i < prevKey; ++i) {
 					items.push({"name": names[i], "action": function() { alert(names[i]); }});
-				//	items.push({"name": "item"+i, "action": function() { alert(this.name); }});
 				}
 				return items;
 			}
