@@ -24,7 +24,7 @@ class GestureListener {
 		this.a = 1;
 		this.c = 0.0275;
 		this.state = 0;
-		this.getDevelopersList();
+		this.loadGestures();
 		this.example = <HTMLCanvasElement> document.getElementById('example');
 		this.ctx = this.example.getContext('2d');
 		this.onMouseDown = <any>this.onMouseDown.bind(this);
@@ -128,16 +128,16 @@ class GestureListener {
 	    xhr.send();
 	}
 
-	getDevelopersList() {
+	loadGestures() {
 	    var url = "gestures.json";
-	    this.downloadData(url, this.recieveDevelopersList.bind(this));
+	    this.downloadData(url, this.processGestures.bind(this));
 	}
 	
-	recieveDevelopersList(xhr) {
+	processGestures(xhr) {
 	    var fileData = JSON.parse(xhr.responseText);
         this.data = [];
         for (var i = 0; i < fileData.length; i++) 
-	       this.data[i] = new gestures.Gesture(<string> fileData[i].name, <string[]> fileData[i].key);
+	       this.data[i] = new gestures.Gesture(<string> fileData[i].name, <string[]> fileData[i].key, <number> fileData[i].factor);
 	}
 	
 }

@@ -8,7 +8,7 @@ var GestureListener = (function () {
         this.a = 1;
         this.c = 0.0275;
         this.state = 0;
-        this.getDevelopersList();
+        this.loadGestures();
         this.example = document.getElementById('example');
         this.ctx = this.example.getContext('2d');
         this.onMouseDown = this.onMouseDown.bind(this);
@@ -98,15 +98,15 @@ var GestureListener = (function () {
         };
         xhr.send();
     };
-    GestureListener.prototype.getDevelopersList = function () {
+    GestureListener.prototype.loadGestures = function () {
         var url = "gestures.json";
-        this.downloadData(url, this.recieveDevelopersList.bind(this));
+        this.downloadData(url, this.processGestures.bind(this));
     };
-    GestureListener.prototype.recieveDevelopersList = function (xhr) {
+    GestureListener.prototype.processGestures = function (xhr) {
         var fileData = JSON.parse(xhr.responseText);
         this.data = [];
         for (var i = 0; i < fileData.length; i++)
-            this.data[i] = new gestures.Gesture(fileData[i].name, fileData[i].key);
+            this.data[i] = new gestures.Gesture(fileData[i].name, fileData[i].key, fileData[i].factor);
     };
     return GestureListener;
 })();
