@@ -60,10 +60,10 @@ var keyGiver;
             }
         }
         KeyGiver.prototype.getSymbol = function (pair) {
-            var curAr1 = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+            var curAr1 = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
             var curNumX = pair.first - this.minX;
             var curNumY = pair.second - this.minY;
-            return curAr1[Math.floor(curNumX * 8 / (this.maxX + 1 - this.minX))] + +(Math.floor(curNumY * 8 / Math.floor(this.maxY + 1 - this.minY)));
+            return curAr1[Math.floor(curNumX * 9 / (this.maxX + 1 - this.minX))] + +(Math.floor(curNumY * 9 / Math.floor(this.maxY + 1 - this.minY)));
         };
         KeyGiver.prototype.getKey = function () {
             var key = [];
@@ -78,6 +78,11 @@ var keyGiver;
                     key[index] = str1;
                     index++;
                 }
+            }
+            key.sort();
+            for (var i = key.length - 2; i >= 0; i--) {
+                if (key[i] === key[i + 1])
+                    key.splice(i, 1);
             }
             this.isGesture(key);
             return key;
@@ -97,7 +102,7 @@ var keyGiver;
             }
             var str = "";
             var prevKey = 0;
-            while (prevKey < this.gestures.length && this.levenshtein(this.gestures[prevKey].key, key) / Math.max(this.gestures[prevKey].key.length, key.length) <= 0.4)
+            while (prevKey < this.gestures.length && this.levenshtein(this.gestures[prevKey].key, key) / Math.max(this.gestures[prevKey].key.length, key.length) <= this.gestures[prevKey].factor)
                 prevKey++;
             if (prevKey === 0)
                 return;
@@ -134,33 +139,28 @@ var keyGiver;
         };
         // Calculate levenshtain's distance between s1 and s2
         KeyGiver.prototype.levenshtein = function (s1, s2) {
-            var i, j, l1, l2, flip, ch, chl, ii, ii2, cost, cutHalf;
-            l1 = s1.length;
-            l2 = s2.length;
-            var cr = 1;
-            var cri = 1;
-            var ci = 1;
-            var cd = 1;
-            cutHalf = flip = Math.max(l1, l2);
-            var minCost = Math.min(cd, ci, cr);
-            var minD = Math.max(minCost, (l1 - l2) * cd);
-            var minI = Math.max(minCost, (l2 - l1) * ci);
-            var buf = new Array((cutHalf * 2) - 1);
-            for (i = 0; i <= l2; ++i) {
-                buf[i] = i * minD;
-            }
-            for (i = 0; i < l1; ++i, flip = cutHalf - flip) {
-                ch = s1[i];
-                chl = ch;
-                buf[flip] = (i + 1) * minI;
-                ii = flip;
-                ii2 = cutHalf - flip;
-                for (j = 0; j < l2; ++j, ++ii, ++ii2) {
-                    cost = (ch === s2[j] ? 0 : (chl === s2[j]) ? cri : cr);
-                    buf[ii + 1] = Math.min(buf[ii2 + 1] + cd, buf[ii] + ci, buf[ii2] + cost);
+            var ans = 0;
+            for (var i = 0; i < s1.length; i++) {
+                var minDist = 1000;
+                for (var j = 0; j < s2.length; j++) {
+                    var d1 = Math.abs(s1[i].charCodeAt(0) - s2[j].charCodeAt(0));
+                    var d2 = Math.abs(s1[i][1] - s2[j][1]);
+                    if (d1 + d2 < minDist)
+                        minDist = d1 + d2;
                 }
+                ans += minDist;
             }
-            return buf[l2 + cutHalf - flip];
+            for (var i = 0; i < s2.length; i++) {
+                var minDist = 1000;
+                for (var j = 0; j < s1.length; j++) {
+                    var d1 = Math.abs(s2[i].charCodeAt(0) - s1[j].charCodeAt(0));
+                    var d2 = Math.abs(s2[i][1] - s1[j][1]);
+                    if (d1 + d2 < minDist)
+                        minDist = d1 + d2;
+                }
+                ans += minDist;
+            }
+            return ans / 2;
         };
         return KeyGiver;
     })();
