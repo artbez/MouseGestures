@@ -40,7 +40,7 @@ class GestureListener {
 	}
 	
 	onMouseDown(e) {
-		if (context_menu.isVisible())
+		if (context_menu.isVisible() || !e.ctrlKey)
 		{
 			return;
 		}
