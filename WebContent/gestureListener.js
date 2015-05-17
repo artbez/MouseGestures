@@ -21,7 +21,7 @@ var GestureListener = (function () {
         return new utils.Pair(pair2.first * b + (1 - b) * pair1.first, pair2.second + (1 - b) * pair1.second);
     };
     GestureListener.prototype.onMouseDown = function (e) {
-        if (context_menu.isVisible()) {
+        if (context_menu.isVisible() || !e.ctrlKey) {
             return;
         }
         if (this.flagDraw == false) {
